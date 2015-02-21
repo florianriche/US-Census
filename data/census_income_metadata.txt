@@ -14,7 +14,7 @@
 | original UCI/ADULT database.  The goal field of this data, however,
 | was drawn from the "total person income" field rather than the
 | "adjusted gross income" and may, therefore, behave differently than the	
-| orginal ADULT goal field.
+| orgin	al ADULT goal field.
 |
 | More information detailing the meaning of the attributes can be
 | found in http://www.bls.census.gov/cps/cpsmain.htm
@@ -25,7 +25,7 @@
 | ~ class of worker				ACLSWKR
 | NON industry code					ADTIND
 | NON occupation code				ADTOCC
-| NON PRESENTadjusted gross income				AGI
+| NON PRESENT adjusted gross income				AGI
 | OUI education					AHGA
 | OUI wage per hour					AHRSPAY
 | NON enrolled in edu inst last wk			AHSCOL

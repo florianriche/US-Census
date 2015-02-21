@@ -13,15 +13,15 @@ import matplotlib.pyplot as plt
 from sklearn import linear_model
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import preprocessing
-from sklearn import metrics
+from patsy import dmatrices
 from sklearn.metrics import confusion_matrix
 
-plt.style.use('ggp lot')
+plt.style.use('ggplot')
 '''Loading datas'''
 columns_labels= [lines.rstrip() for lines in open("data/columns_name.txt","r")]
 new_na_values=['NA','Do not know'," Not in universe"," ?"]
 data = pd.read_csv("data/census_income_learn.csv",sep=",",header=0,names=columns_labels,na_values=new_na_values)
-	model_features_category = ['ACLSWKR','AHGA','AMARITL','AWKSTAT','ARACE','ASEX','PRCITSHP','SEOTR','VETYN']
+model_features_category = ['AHGA','AMARITL','AWKSTAT','ARACE','ASEX','PRCITSHP','SEOTR','VETYN']
 model_features_continuous= ['AAGE','AHRSPAY','CAPNET','DIVVAL','NOEMP','WKSWORK']
 
 
@@ -47,7 +47,7 @@ for label in model_features_continuous:
 '''Setting of main variables'''
 '''PLOT OF SEVERAL COLUMNS'''
 #AGE
-
+'''
 age = data[['AAGE','INCOME']]
 
 data.groupby('INCOME').mean().T.plot(kind='bar',stacked=True)
@@ -99,6 +99,14 @@ confusion_matrix(Y,Y_pr)
 float(Y.value_counts()[1])/float(Y.count())
 
 
+##REALISATION DU MODELE LOGISTIQUE
+s=""
+for label in model_features_category:
+    s=s+"C("+label+") + "
+for label in model_features_continuous[:-1]:
+    s= s + label+" + "
+s= s + model_features_continuous[-1]
+#Y_prime, X_prime = dmatrices('INCOME ~ '+s,data,return_type="dataframe")
 X_Prime = X[model_features_continuous]
 print X_Prime.head(5)
 for label in model_features_category:
