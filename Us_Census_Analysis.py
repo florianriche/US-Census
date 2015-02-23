@@ -30,6 +30,8 @@
 # 
 # * The test set is composed of 99762 observations
 # 
+# Below is a description of the different columns that appear in the Dataset: 
+# 
 # |Description|Code|Example|
 # |-----------------------------|-----|
 # | Age						|AAGE|25|
@@ -219,13 +221,13 @@ plt.show()
 
 # <markdowncell>
 
-# Let's see if we can find some features where there are many differences.
+# It appears that for most of the features, we have many small values and a few big ones, giving very wide distributions.
+# 
+# Now let's see if we can find some features where there are many differences.
 
 # <codecell>
 
 Means= Result.groupby("PTOTVAL").mean()
-Means
-
 
 Proportion = (Means/Means.sum()).T.sort(columns=1)
 Proportion.plot(kind='bar',stacked=True)
@@ -234,8 +236,6 @@ plt.xlabel('Continuous variables')
 plt.ylabel('Proportion')
 plt.legend(bbox_to_anchor=(1.2, 1), loc=2, borderaxespad=0.)
 plt.show()
-#.T.plot(kind='bar',stacked=True)
-#plt.show()
 
 # <markdowncell>
 
@@ -264,9 +264,12 @@ fig.suptitle('Age Distribution', fontsize=20)
 plt.xlabel('Age')
 plt.ylabel('Proportion')
 plt.legend(bbox_to_anchor=(1.2, 1), loc=2, borderaxespad=0.)
-
 plt.show()
 
+# <markdowncell>
+
+# We can see that there is  a 10 year difference between the mean Age of the general dataset and the mean age of the High Income.
+# It could be expected as wages increase as the career evolves.
 
 # <headingcell level=4>
 
@@ -280,6 +283,10 @@ plt.show()
 
 Result = data[model_features_category+["PTOTVAL"]]
 Result.isnull().sum()
+
+# <markdowncell>
+
+# Again, let's describe our categorical features using *describe()* .
 
 # <codecell>
 
@@ -359,10 +366,10 @@ for label in model_features_continuous:
 forest = RandomForestClassifier(n_estimators=30)
 forest.fit(X,Y)
 Y_predict = forest.predict(X)
-print forest.score(X,Y)
-print metrics.classification_report(Y,Y_predict)
-print metrics.confusion_matrix(Y,Y_predict)
-print metrics.roc_auc_score(Y,Y_predict)
+print "Score : " ,forest.score(X,Y)
+print "Classification report : \n ", metrics.classification_report(Y,Y_predict)
+print "Confusion matrix : \n " ,metrics.confusion_matrix(Y,Y_predict)
+print "ROC Score : ", metrics.roc_auc_score(Y,Y_predict)
 
 # <markdowncell>
 
@@ -385,10 +392,10 @@ for label in model_features_category:
 logModel = linear_model.LogisticRegression(C=1)
 logModel.fit(X_log,Y)
 Y_predict = logModel.predict(X_log)
-print logModel.score(X_log,Y)
-print metrics.classification_report(Y,Y_predict)
-print metrics.confusion_matrix(Y,Y_predict)
-print metrics.roc_auc_score(Y,Y_predict)
+print "Score : ", logModel.score(X_log,Y)
+print "Classification report : \n", metrics.classification_report(Y,Y_predict)
+print "Confusion matrix : \n",metrics.confusion_matrix(Y,Y_predict)
+print "ROC Score : ", metrics.roc_auc_score(Y,Y_predict)
 
 # <markdowncell>
 
@@ -405,8 +412,13 @@ for train,test in kf:
     Scores.append(metrics.precision_score(logModel.predict(X_log_test),Y_test))
     Models.append(logModel)
 #Get the maximum index
-BetterScore= Scores.index(max(Scores))
-logModel= Models[BetterScore]
+BestScore= Scores.index(max(Scores))
+logModel= Models[BestScore]
+print "Confusion matrix : ", metrics.classification_report(Y,logModel.predict(X_log))
+
+# <markdowncell>
+
+# Which is roughly the same as our previous score.
 
 # <headingcell level=2>
 
@@ -418,6 +430,8 @@ logModel= Models[BetterScore]
 # We want to have a good precision and a good recall; the F1-score is a good synthesis and it appears that the Random Forest has a better result.
 # 
 # Let's see if it works also on the testing set.
+# 
+# First let's do the same transformations that we did on our learning set.
 
 # <codecell>
 
@@ -440,12 +454,16 @@ for label in model_features_category:
 for label in model_features_continuous:
     X_test[label] = ss.fit_transform(X_test[label])
 
+# <markdowncell>
+
+# Apply the random forest model to our new dataset.
+
 # <codecell>
 
 Y_test_predicted= forest.predict(X_test)
-print metrics.classification_report(Y_test,Y_test_predicted)
-print metrics.roc_auc_score(Y_test,Y_test_predicted)
-print metrics.confusion_matrix(Y_test,Y_test_predicted)
+print "Classification report : \n", metrics.classification_report(Y_test,Y_test_predicted)
+print "Confusion matrix : \n",metrics.confusion_matrix(Y_test,Y_test_predicted)
+print "ROC Score : ",metrics.roc_auc_score(Y_test,Y_test_predicted)
 
 # <markdowncell>
 
@@ -544,9 +562,9 @@ plt.show()
 
 # We got a model that overfitted the learning set and is not wrong when it dares to predicts but lacks some features to find all targets.
 # 
-# There is probably more work to do on the Data cleaning. They are too much children that appear in the model and some features have maybe be discareded too quickly in the beginning of the process.
+# There is probably more work to do on the Data cleaning. They are too much children that appear in the model and some features have maybe be discarded too quickly in the beginning of the process.
 # 
-# The na_values should maybe be handled differently, if I had to continue this work further, I would probably try to see if I can fill the missing data rather than just set them to NaN.
+# The NaN values should maybe be handled differently, if I had to continue this work further, I would probably try to see if I can fill the missing data rather than just set them to NaN.
 # 
 # The challenging tasks were clearly to clean the dataset as well as finding a way to visually explore the data.
 
